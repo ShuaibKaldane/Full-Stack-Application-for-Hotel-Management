@@ -1,0 +1,4 @@
+USE harbor_house;
+INSERT INTO users (name,email,password_hash,role) VALUES ('Super Admin','admin@gmail.com','$2b$12$D.ncU3JZjeHePs0XLhXXOuBEq9ZSV.gDWLuXgXaW7iUN5nHcQ.SxG','super_admin') ON DUPLICATE KEY UPDATE password_hash=VALUES(password_hash), role='super_admin';
+INSERT INTO properties (name,description,address,city,image_url) SELECT 'Harbor House','A welcoming stay by the water.','1 Harbor Way','Bay City',NULL WHERE NOT EXISTS (SELECT 1 FROM properties WHERE name='Harbor House');
+INSERT INTO menu_items (name,description,category,price) SELECT 'Breakfast Basket','Fresh pastries, fruit, and coffee.','Breakfast',18.00 WHERE NOT EXISTS (SELECT 1 FROM menu_items WHERE name='Breakfast Basket');
