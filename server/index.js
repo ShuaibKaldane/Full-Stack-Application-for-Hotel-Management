@@ -68,5 +68,72 @@ app.get('/api/orders', auth, asyncRoute(async (req, res) => { const admin = ['ad
 app.get('/api/cab-bookings', auth, asyncRoute(async (req, res) => { const admin = ['admin','super_admin'].includes(req.user.role); res.json(await query(`SELECT c.*,u.name AS customer_name FROM cab_bookings c JOIN users u ON u.id=c.user_id ${admin ? '' : 'WHERE c.user_id=?'} ORDER BY c.pickup_at DESC`, admin ? [] : [req.user.id])); }));
 app.post('/api/cab-bookings', auth, asyncRoute(async (req, res) => { const missing = required(req.body, ['pickupLocation','dropoffLocation','pickupAt']); if (missing) return res.status(400).json({ error: `${missing} is required.` }); const result = await query('INSERT INTO cab_bookings (user_id,pickup_location,dropoff_location,pickup_at,passengers,vehicle_type,status,notes) VALUES (?,?,?,?,?,?,?,?)', [req.user.id, req.body.pickupLocation, req.body.dropoffLocation, req.body.pickupAt, req.body.passengers || 1, req.body.vehicleType || 'Sedan', 'pending', req.body.notes || null]); res.status(201).json({ id: result.insertId }); }));
 
+// =====================================================
+// HOUSEKEEPING TASKS
+// =====================================================
+app.get('/api/housekeeping-tasks', auth, roles('super_admin','admin'), asyncRoute(async (req, res) => {
+  const { status, priority } = req.query;
+  const filters = [];
+  const params = [];
+  if (status) { filters.push('status=?'); params.push(status); }
+  if (priority) { filters.push('priority=?'); params.push(priority); }
+  const where = filters.length ? ` WHERE ${filters.join(' AND ')}` : '';
+  const rows = await query(`SELECT * FROM housekeeping_tasks${where} ORDER BY FIELD(priority,'urgent','high','normal','low'), FIELD(status,'pending','in_progress','completed'), due_at ASC`, params);
+  res.json(rows);
+}));
+app.post('/api/housekeeping-tasks', auth, roles('super_admin','admin'), asyncRoute(async (req, res) => {
+  const missing = required(req.body, ['property','roomNumber','taskType']);
+  if (missing) return res.status(400).json({ error: `${missing} is required.` });
+  const result = await query(
+    'INSERT INTO housekeeping_tasks (property,room_number,task_type,status,priority,assignee,notes,due_at) VALUES (?,?,?,?,?,?,?,?)',
+    [req.body.property, req.body.roomNumber, req.body.taskType, 'pending', req.body.priority || 'normal', req.body.assignee || null, req.body.notes || null, req.body.dueAt || null]
+  );
+  res.status(201).json({ id: result.insertId });
+}));
+app.patch('/api/housekeeping-tasks/:id', auth, roles('super_admin','admin'), asyncRoute(async (req, res) => {
+  const fields = [];
+  const params = [];
+  for (const key of ['status','priority','assignee','notes','dueAt']) {
+    if (req.body[key] !== undefined) {
+      const column = key === 'dueAt' ? 'due_at' : (key === 'assignee' ? 'assignee' : key);
+      fields.push(`${column}=?`);
+      params.push(req.body[key]);
+    }
+  }
+  if (!fields.length) return res.status(400).json({ error: 'No updatable fields provided.' });
+  params.push(req.params.id);
+  await query(`UPDATE housekeeping_tasks SET ${fields.join(', ')} WHERE id=?`, params);
+  res.json({ ok: true });
+}));
+app.delete('/api/housekeeping-tasks/:id', auth, roles('super_admin','admin'), asyncRoute(async (req, res) => {
+  await query('DELETE FROM housekeeping_tasks WHERE id=?', [req.params.id]);
+  res.json({ ok: true });
+}));
+
+// =====================================================
+// RESTAURANT / KITCHEN
+// =====================================================
+app.patch('/api/orders/:id/status', auth, roles('super_admin','admin'), asyncRoute(async (req, res) => {
+  const allowed = ['pending','preparing','ready','completed','cancelled'];
+  if (!allowed.includes(req.body.status)) return res.status(400).json({ error: 'Invalid status.' });
+  await query('UPDATE food_orders SET status=? WHERE id=?', [req.body.status, req.params.id]);
+  res.json({ ok: true });
+}));
+app.get('/api/restaurant/stats', auth, roles('super_admin','admin'), asyncRoute(async (req, res) => {
+  const rows = await query(`SELECT status, COUNT(*) AS count, COALESCE(SUM(total),0) AS revenue FROM food_orders GROUP BY status`);
+  const summary = { pending: 0, preparing: 0, ready: 0, completed: 0, cancelled: 0, revenue: 0 };
+  for (const row of rows) {
+    const count = Number(row.count);
+    if (summary[row.status] !== undefined) summary[row.status] = count;
+    summary.revenue += Number(row.revenue);
+  }
+  const today = await query(`SELECT COUNT(*) AS count, COALESCE(SUM(total),0) AS revenue FROM food_orders WHERE DATE(created_at)=CURRENT_DATE`);
+  const pendingList = await query(`SELECT id,status,total,created_at FROM food_orders WHERE status IN ('pending','preparing','ready') ORDER BY created_at ASC LIMIT 6`);
+  summary.todayCount = Number(today[0]?.count || 0);
+  summary.todayRevenue = Number(today[0]?.revenue || 0);
+  summary.queue = pendingList;
+  res.json(summary);
+}));
+
 app.use((error, req, res, next) => { console.error(error); res.status(error.code === 'ER_DUP_ENTRY' ? 409 : 503).json({ error: dbError(error) }); });
 app.listen(port, () => console.log(`Hotel API listening on http://localhost:${port}`));

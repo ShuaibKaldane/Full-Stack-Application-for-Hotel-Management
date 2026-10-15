@@ -29,7 +29,8 @@ The application includes two role-based experiences:
 - Search reservations
 - Create bookings for guests
 - Review occupancy and revenue overview
-- Access operations shortcuts for housekeeping and restaurant workflows
+- Housekeeping operations board (create tasks, assign staff, track status)
+- Restaurant and kitchen view with live order queue (advance orders through pending → preparing → ready → completed)
 
 ### Backend
 
@@ -75,6 +76,7 @@ The application includes two role-based experiences:
 │   └── index.js          # Express API server
 ├── sql/
 │   ├── schema.sql        # Database and table definitions
+│   ├── operations.sql    # Housekeeping task definitions and sample data
 │   └── seed.sql          # Initial admin and sample data
 ├── index.html
 ├── vite.config.js        # Vite config and API proxy
@@ -248,6 +250,23 @@ POST /api/orders
 ```text
 GET  /api/cab-bookings
 POST /api/cab-bookings
+```
+
+### Housekeeping
+
+```text
+GET    /api/housekeeping-tasks            # Admin only
+POST   /api/housekeeping-tasks            # Admin only
+PATCH  /api/housekeeping-tasks/:id        # Admin only
+DELETE /api/housekeeping-tasks/:id        # Admin only
+```
+
+### Restaurant and kitchen
+
+```text
+GET   /api/orders                  # Already documented above
+PATCH /api/orders/:id/status       # Admin only — advance kitchen status
+GET   /api/restaurant/stats        # Admin only — counts and revenue summary
 ```
 
 ### Users and health
