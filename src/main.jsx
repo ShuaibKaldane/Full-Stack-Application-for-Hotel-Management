@@ -1,6 +1,15 @@
+
+const seedPayments = [
+  { id: 'p1', customer_name: 'Jordan Lee', amount: 855.00, method: 'card', status: 'completed', description: 'Reservation · Harbor House · Deluxe King', card_last4: '4242', reference: 'TXN89F2A04', created_at: new Date(Date.now() - 86400000*3).toISOString() },
+  { id: 'p2', customer_name: 'Jordan Lee', amount: 48.50, method: 'upi', status: 'completed', description: 'In-room dining · Pacific cod', card_last4: null, reference: 'TXNK3P7M2', created_at: new Date(Date.now() - 86400000*2).toISOString() },
+  { id: 'p3', customer_name: 'Aanya Patel', amount: 320.00, method: 'card', status: 'pending', description: 'Reservation · Napa Valley escape', card_last4: '1881', reference: 'TXNQ7R3X9', created_at: new Date(Date.now() - 86400000*1).toISOString() },
+  { id: 'p4', customer_name: 'Marcus Reed', amount: 1240.00, method: 'card', status: 'completed', description: 'Reservation · The Juniper Lodge · Garden Suite', card_last4: '9920', reference: 'TXNB4H2J1', created_at: new Date(Date.now() - 86400000*6).toISOString() },
+  { id: 'p5', customer_name: 'Eliza Tan', amount: 76.00, method: 'wallet', status: 'completed', description: 'In-room dining · Miso salmon bowl', card_last4: null, reference: 'TXN5X9P1K', created_at: new Date(Date.now() - 86400000*4).toISOString() },
+  { id: 'p6', customer_name: 'Daniel Cohen', amount: 24.00, method: 'card', status: 'failed', description: 'In-room dining · Avocado toast', card_last4: '0011', reference: 'TXNF2X6KK', created_at: new Date(Date.now() - 86400000*5).toISOString() }
+];
 import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ArrowRight, BedDouble, Bell, CalendarDays, Car, Check, ChevronDown, Clock3, Coffee, Compass, Crown, LayoutDashboard, LogOut, MapPin, Menu, Moon, Plus, Search, ShieldCheck, Sparkles, SprayCan, Star, Tag, Trash2, Utensils, Users, Wrench, X } from 'lucide-react'
+import { ArrowRight, Banknote, BedDouble, Bell, Building2, CalendarDays, Car, Check, ChevronDown, Clock3, Coffee, Compass, CreditCard, Crown, LayoutDashboard, LogOut, MapPin, Menu, Moon, Plus, Receipt, Search, ShieldCheck, Sparkles, SprayCan, Star, Tag, Trash2, Utensils, Users, Wallet, Wrench, X } from 'lucide-react'
 import './styles.css'
 
 const seedUsers = [{ id: 'u1', name: 'Super Admin', email: 'admin@gmail.com', password: 'test1234', role: 'super_admin' }, { id: 'u2', name: 'Jordan Lee', email: 'customer@example.com', password: 'customer123', role: 'customer' }]
@@ -12,7 +21,7 @@ const properties = [
 const dishes = [{ name: 'Avocado toast', meal: 'Breakfast', price: 15, desc: 'Sourdough, poached egg, chili oil', icon: '🥑' }, { name: 'Lemon ricotta pancakes', meal: 'Breakfast', price: 17, desc: 'Berry compote, maple, whipped cream', icon: '🥞' }, { name: 'Miso salmon bowl', meal: 'Lunch', price: 24, desc: 'Jasmine rice, edamame, sesame greens', icon: '🍣' }, { name: 'Garden caesar', meal: 'Lunch', price: 16, desc: 'Little gem, parmesan, sourdough crumb', icon: '🥗' }, { name: 'Wild mushroom pasta', meal: 'Dinner', price: 28, desc: 'Tagliatelle, truffle, aged pecorino', icon: '🍝' }, { name: 'Pacific cod', meal: 'Dinner', price: 32, desc: 'Saffron broth, fennel, lemon', icon: '🐟' }]
 const cabs = [{ name: 'Golden Gate & Sausalito', time: '4 hours', price: 160, image: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=700&q=80' }, { name: 'City lights by night', time: '3 hours', price: 125, image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=700&q=80' }, { name: 'Napa Valley escape', time: '8 hours', price: 320, image: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=700&q=80' }]
 
-const local = { users: () => JSON.parse(localStorage.getItem('hh_users') || 'null') || seedUsers, bookings: () => JSON.parse(localStorage.getItem('hh_bookings') || '[]'), orders: () => JSON.parse(localStorage.getItem('hh_orders') || '[]'), cabs: () => JSON.parse(localStorage.getItem('hh_cabs') || '[]'), tasks: () => JSON.parse(localStorage.getItem('hh_tasks') || 'null') || [
+const local = { users: () => JSON.parse(localStorage.getItem('hh_users') || 'null') || seedUsers, bookings: () => JSON.parse(localStorage.getItem('hh_bookings') || '[]'), orders: () => JSON.parse(localStorage.getItem('hh_orders') || '[]'), cabs: () => JSON.parse(localStorage.getItem('hh_cabs') || '[]'), payments: () => JSON.parse(localStorage.getItem('hh_payments') || 'null') || seedPayments, tasks: () => JSON.parse(localStorage.getItem('hh_tasks') || 'null') || [
   { id: 1, property: 'Harbor House', room_number: '201', task_type: 'clean', status: 'completed', priority: 'high', assignee: 'Maya Chen', notes: 'Deep clean after checkout', due_at: new Date(Date.now() + 3600000).toISOString() },
   { id: 2, property: 'Harbor House', room_number: '208', task_type: 'inspect', status: 'in_progress', priority: 'normal', assignee: 'Daniel Park', notes: 'Mid-stay inspection', due_at: new Date(Date.now() + 7200000).toISOString() },
   { id: 3, property: 'Harbor House', room_number: '312', task_type: 'maintenance', status: 'pending', priority: 'urgent', assignee: null, notes: 'Air conditioning unit not cooling', due_at: new Date(Date.now() + 10800000).toISOString() },
@@ -76,26 +85,46 @@ function Portal({ user, favorites, toggleFavorite, logout, notify }) {
   const addTask = (event) => { event.preventDefault(); const d = Object.fromEntries(new FormData(event.currentTarget)); const next = [{ id: Date.now(), property: d.property || 'Harbor House', room_number: d.room_number, task_type: d.task_type, status: 'pending', priority: d.priority || 'normal', assignee: d.assignee || null, notes: d.notes || '', due_at: d.due_at || null }, ...tasks]; setTasks(persist('tasks', next)); setShowTask(false); notify(`Task added for Room ${d.room_number}.`) }
   const removeTask = (id) => { setTasks(persist('tasks', tasks.filter(t => t.id !== id))); notify('Task removed.') }
   const updateOrderStatus = (id, status) => { setOrders(persist('orders', orders.map(o => o.id === id ? { ...o, status } : o))); notify(`Order ${status.toLowerCase()}.`) }
-  const nav = admin ? [['Overview', LayoutDashboard], ['Reservations', CalendarDays], ['Housekeeping', BedDouble], ['Restaurant', Utensils]] : [['Discover', Compass], ['My stays', CalendarDays], ['Dining', Utensils], ['Sightseeing', Car]]
-  return <div className="portal"><aside className="sidebar"><div className="brand"><span className="brand-mark"><Sparkles size={17} /></span> harbor house</div>{admin && <div className="property-switcher"><div className="property-icon">HH</div><div><strong>Harbor House</strong><span>San Francisco, CA</span></div><ChevronDown size={14} /></div>}<div className="menu-label">{admin ? 'Workspace' : 'Your journey'}</div><nav>{nav.map(([label, Icon]) => <button className={`nav-item ${page === label ? 'active' : ''}`} key={label} onClick={() => setPage(label)}><Icon size={17} /><span>{label}</span>{label === 'Reservations' && bookings.length > 0 && <em>{bookings.length}</em>}</button>)}</nav>{admin && <><div className="menu-label second">Operations</div><nav>{[['Guests', Users]].map(([label, Icon]) => <button className={`nav-item ${page === label ? 'active' : ''}`} key={label} onClick={() => setPage(label)}><Icon size={17} /><span>{label}</span></button>)}</nav></>}<div className="sidebar-footer"><button className="nav-item" onClick={() => notify('Settings are coming soon')}><ShieldCheck size={17} /><span>Account & settings</span></button><div className="profile"><div className="avatar avatar-user">{user.name.split(' ').map(x => x[0]).join('').slice(0, 2)}</div><div><strong>{user.name}</strong><span>{admin ? 'Administrator' : 'Guest member'}</span></div><button className="logout" onClick={logout}><LogOut size={15} /></button></div></div></aside><main className="main-content"><header className="topbar"><div className="mobile-brand brand"><span className="brand-mark"><Sparkles size={14} /></span> harbor house</div><div className="breadcrumb"><span>{admin ? 'Workspace' : 'Harbor House'}</span><b>/</b><strong>{page}</strong></div><div className="top-actions"><div className="top-search"><Search size={16} /><input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} /></div><button className="icon-btn" onClick={() => notify('You are all caught up')}><Bell size={18} /><i /></button><div className="date-pill"><MapPin size={14} /> San Francisco <ChevronDown size={13} /></div></div></header><div className="page-content">{admin ? <AdminPage page={page} user={user} bookings={bookings} tasks={tasks} updateTask={updateTask} removeTask={removeTask} orders={orders} updateOrderStatus={updateOrderStatus} setShowBooking={setShowBooking} setShowTask={setShowTask} search={search} notify={notify} /> : <CustomerPage page={page} user={user} bookings={bookings} setBookings={setBookings} orders={orders} setOrders={setOrders} cabBookings={cabBookings} setCabBookings={setCabBookings} cart={cart} setCart={setCart} setShowBooking={setShowBooking} search={search} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} />}</div></main>{showBooking && <BookingModal onClose={() => setShowBooking(false)} onSubmit={addBooking} admin={admin} />}{showTask && <TaskModal onClose={() => setShowTask(false)} onSubmit={addTask} />}</div>
+  const [payments, setPayments] = useState(local.payments)
+  const [payTarget, setPayTarget] = useState(null)
+  const openPay = (t) => setPayTarget(t)
+  const closePay = () => setPayTarget(null)
+  const addPayment = (entry) => {
+    const next = [{ ...entry, id: entry.id || `p${Date.now()}`, created_at: entry.created_at || new Date().toISOString() }, ...payments]
+    setPayments(persist('payments', next))
+    notify(`Payment of $${Number(entry.amount).toFixed(2)} completed · ${entry.reference || 'TXN'}`)
+    if (payTarget && payTarget.markPaid) payTarget.markPaid(entry)
+    closePay()
+  }
+  const nav = admin ? [['Overview', LayoutDashboard], ['Reservations', CalendarDays], ['Housekeeping', BedDouble], ['Restaurant', Utensils], ['Payments', Receipt]] : [['Discover', Compass], ['My stays', CalendarDays], ['Dining', Utensils], ['Sightseeing', Car], ['Billing', Receipt]]
+  return <div className="portal"><aside className="sidebar"><div className="brand"><span className="brand-mark"><Sparkles size={17} /></span> harbor house</div>{admin && <div className="property-switcher"><div className="property-icon">HH</div><div><strong>Harbor House</strong><span>San Francisco, CA</span></div><ChevronDown size={14} /></div>}<div className="menu-label">{admin ? 'Workspace' : 'Your journey'}</div><nav>{nav.map(([label, Icon]) => <button className={`nav-item ${page === label ? 'active' : ''}`} key={label} onClick={() => setPage(label)}><Icon size={17} /><span>{label}</span>{label === 'Reservations' && bookings.length > 0 && <em>{bookings.length}</em>}</button>)}</nav>{admin && <><div className="menu-label second">Operations</div><nav>{[['Guests', Users]].map(([label, Icon]) => <button className={`nav-item ${page === label ? 'active' : ''}`} key={label} onClick={() => setPage(label)}><Icon size={17} /><span>{label}</span></button>)}</nav></>}<div className="sidebar-footer"><button className="nav-item" onClick={() => notify('Settings are coming soon')}><ShieldCheck size={17} /><span>Account & settings</span></button><div className="profile"><div className="avatar avatar-user">{user.name.split(' ').map(x => x[0]).join('').slice(0, 2)}</div><div><strong>{user.name}</strong><span>{admin ? 'Administrator' : 'Guest member'}</span></div><button className="logout" onClick={logout}><LogOut size={15} /></button></div></div></aside><main className="main-content"><header className="topbar"><div className="mobile-brand brand"><span className="brand-mark"><Sparkles size={14} /></span> harbor house</div><div className="breadcrumb"><span>{admin ? 'Workspace' : 'Harbor House'}</span><b>/</b><strong>{page}</strong></div><div className="top-actions"><div className="top-search"><Search size={16} /><input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} /></div><button className="icon-btn" onClick={() => notify('You are all caught up')}><Bell size={18} /><i /></button><div className="date-pill"><MapPin size={14} /> San Francisco <ChevronDown size={13} /></div></div></header><div className="page-content">{admin ? <AdminPage page={page} user={user} bookings={bookings} tasks={tasks} updateTask={updateTask} removeTask={removeTask} orders={orders} updateOrderStatus={updateOrderStatus} payments={payments} addPayment={addPayment} openPay={openPay} closePay={closePay} payTarget={payTarget} setShowBooking={setShowBooking} setShowTask={setShowTask} search={search} notify={notify} /> : <CustomerPage page={page} user={user} bookings={bookings} setBookings={setBookings} orders={orders} setOrders={setOrders} cabBookings={cabBookings} setCabBookings={setCabBookings} cart={cart} setCart={setCart} setShowBooking={setShowBooking} search={search} favorites={favorites} toggleFavorite={toggleFavorite} payments={payments} addPayment={addPayment} openPay={openPay} notify={notify} />}</div></main>{showBooking && <BookingModal onClose={() => setShowBooking(false)} onSubmit={addBooking} admin={admin} />}{showTask && <TaskModal onClose={() => setShowTask(false)} onSubmit={addTask} />}{payTarget && <PaymentModal onClose={closePay} target={payTarget} onSubmit={addPayment} />}</div>
 }
 
-function CustomerPage({ page, user, bookings, setBookings, orders, setOrders, cabBookings, setCabBookings, cart, setCart, setShowBooking, search, favorites, toggleFavorite, notify }) {
+function CustomerPage({ page, user, bookings, setBookings, orders, setOrders, cabBookings, setCabBookings, cart, setCart, setShowBooking, search, favorites, toggleFavorite, payments, addPayment, openPay, notify }) {
   const mine = bookings.filter(b => b.userId === user.id); const filtered = properties.filter(p => `${p.name} ${p.city}`.toLowerCase().includes(search.toLowerCase()))
   if (page === 'Dining') return <Dining cart={cart} setCart={setCart} orders={orders} setOrders={setOrders} notify={notify} />
   if (page === 'Sightseeing') return <Sightseeing cabBookings={cabBookings} setCabBookings={setCabBookings} notify={notify} />
-  if (page === 'My stays') return <Stays bookings={mine} setShowBooking={setShowBooking} />
+  if (page === 'My stays') return <Stays bookings={mine} setShowBooking={setShowBooking} openPay={openPay} />
+  if (page === 'Billing') return <BillingPage bookings={mine} orders={orders} payments={payments} openPay={openPay} notify={notify} />
   return <><div className="hero-row"><div><p className="eyebrow">{page === 'Discover' ? 'GOOD MORNING, ' + user.name.split(' ')[0].toUpperCase() : 'YOUR PRIVATE CONCIERGE'}</p><h1>Make room for <i>beautiful</i> days.</h1><p className="subheading">Find a stay that feels like it was made for you.</p></div><button className="primary-btn" onClick={() => setShowBooking(true)}><Plus size={17} /> Plan a stay</button></div><section className="search-card"><div><MapPin size={18} /><label>Where are you going?<input placeholder="San Francisco, California" /></label></div><div><CalendarDays size={18} /><label>Dates<input placeholder="Add dates" /></label></div><button className="primary-btn">Search stays <ArrowRight size={16} /></button></section><div className="section-title"><div><h2>Stay somewhere wonderful</h2><p>Handpicked properties for your next chapter</p></div><button className="text-btn">View all <ArrowRight size={15} /></button></div><div className="property-grid">{filtered.map(p => <article className="property-card" key={p.id}><div className="property-image"><img src={p.image} alt={p.name} /><span className="image-badge"><Star size={12} fill="currentColor" /> {p.rating}</span><button className={`heart ${favorites?.includes(p.id) ? 'favorited' : ''}`} onClick={() => toggleFavorite(p.id)} aria-label="Save">{favorites?.includes(p.id) ? '♥' : '♡'}</button></div><div className="property-info"><div><p>{p.type}</p><h3>{p.name}</h3><span><MapPin size={12} /> {p.city}</span></div><div className="price"><strong>${p.price}</strong><small> / night</small></div></div><div className="tags">{p.tags.map(t => <span key={t}>{t}</span>)}</div><button className="outline-btn" onClick={() => setShowBooking(true)}>View rooms <ArrowRight size={14} /></button></article>)}</div></>
 }
-function Stays({ bookings, setShowBooking }) { return <><div className="hero-row"><div><p className="eyebrow">YOUR JOURNEY</p><h1>Stays worth <i>remembering.</i></h1><p className="subheading">Everything you need for a seamless visit.</p></div><button className="primary-btn" onClick={() => setShowBooking(true)}><Plus size={17} /> New reservation</button></div><div className="section-title"><div><h2>Your reservations</h2><p>{bookings.length ? 'Your upcoming and past stays' : 'Your next chapter starts here'}</p></div></div><div className="stay-list">{bookings.length ? bookings.map(b => <div className="stay-card" key={b.id}><div className="stay-date"><strong>{new Date(b.checkIn || Date.now()).toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}</strong><span>CHECK IN</span></div><div className="stay-main"><div><h3>{b.property || 'Harbor House'}</h3><p><BedDouble size={14} /> {b.room} · {b.checkIn} — {b.checkOut}</p></div><span className="status reserved">{b.status}</span></div><button className="icon-btn"><ArrowRight size={18} /></button></div>) : <div className="empty-card"><CalendarDays size={30} /><h3>No stays yet</h3><p>Find your perfect room and start planning.</p><button className="primary-btn" onClick={() => setShowBooking(true)}>Browse stays</button></div>}</div></> }
+function Stays({ bookings, setShowBooking, openPay }) { return <><div className="hero-row"><div><p className="eyebrow">YOUR JOURNEY</p><h1>Stays worth <i>remembering.</i></h1><p className="subheading">Everything you need for a seamless visit.</p></div><button className="primary-btn" onClick={() => setShowBooking(true)}><Plus size={17} /> New reservation</button></div><div className="section-title"><div><h2>Your reservations</h2><p>{bookings.length ? 'Your upcoming and past stays' : 'Your next chapter starts here'}</p></div></div><div className="stay-list">{bookings.length ? bookings.map(b => <div className="stay-card" key={b.id}><div className="stay-date"><strong>{new Date(b.checkIn || Date.now()).toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}</strong><span>CHECK IN</span></div><div className="stay-main"><div><h3>{b.property || 'Harbor House'}</h3><p><BedDouble size={14} /> {b.room} · {b.checkIn} — {b.checkOut}</p></div><span className="status reserved">{b.status}</span></div>{b.paid ? (
+                <span className="status confirmed">Paid</span>
+              ) : (
+                <button className="primary-btn rk-pay-mini" onClick={() => openPay({ kind: 'stay', bookingId: b.id, amount: b.total || 855, title: b.property || 'Harbor House', subtitle: b.room || 'Deluxe King', markPaid: () => { b.paid = true; } })}>
+                  <CreditCard size={13} /> Pay now
+                </button>
+              )}
+              <button className="icon-btn"><ArrowRight size={18} /></button></div>) : <div className="empty-card"><CalendarDays size={30} /><h3>No stays yet</h3><p>Find your perfect room and start planning.</p><button className="primary-btn" onClick={() => setShowBooking(true)}>Browse stays</button></div>}</div></> }
 
 function Dining({ cart, setCart, orders, setOrders, notify }) { const [meal, setMeal] = useState('Breakfast'); const add = d => { setCart([...cart, d]); notify(`${d.name} added to your order`) }; const submit = () => { if (!cart.length) return; const next = [{ id: Date.now(), items: cart, total: cart.reduce((a, d) => a + d.price, 0), status: 'Preparing' }, ...orders]; setOrders(persist('orders', next)); setCart([]); notify('Order sent to the kitchen') }; return <><div className="hero-row"><div><p className="eyebrow">IN-ROOM DINING</p><h1>A table for <i>every mood.</i></h1><p className="subheading">Fresh, local, and delivered wherever you are.</p></div><div className="order-pill"><Utensils size={16} /><strong>{cart.length}</strong> items · ${cart.reduce((a, d) => a + d.price, 0)}</div></div><div className="tabs">{['Breakfast', 'Lunch', 'Dinner'].map(x => <button className={meal === x ? 'selected' : ''} onClick={() => setMeal(x)} key={x}>{x}</button>)}</div><div className="dining-layout"><div className="menu-grid">{dishes.filter(d => d.meal === meal).map(d => <article className="dish-card" key={d.name}><div className="dish-icon">{d.icon}</div><div><span className="meal-label">{d.meal}</span><h3>{d.name}</h3><p>{d.desc}</p><strong>${d.price}</strong></div><button className="add-btn" onClick={() => add(d)}><Plus size={17} /></button></article>)}</div><aside className="order-card"><h3>Your order</h3>{cart.length ? <>{cart.map((d, i) => <div className="order-line" key={`${d.name}-${i}`}><span>{d.name}</span><strong>${d.price}</strong></div>)}<div className="order-total"><span>Total</span><strong>${cart.reduce((a, d) => a + d.price, 0)}</strong></div><button className="primary-btn wide" onClick={submit}>Place order <ArrowRight size={15} /></button></> : <div className="order-empty"><Coffee size={24} /><p>Your order is empty.</p><small>Add a dish to get started.</small></div>}</aside></div></> }
 
 function Sightseeing({ cabBookings, setCabBookings, notify }) { const book = c => { const next = [{ ...c, id: Date.now(), status: 'Confirmed' }, ...cabBookings]; setCabBookings(persist('cabs', next)); notify(`${c.name} booked — your driver will meet you in the lobby.`) }; return <><div className="hero-row"><div><p className="eyebrow">THE CITY, YOUR WAY</p><h1>Go beyond the <i>front door.</i></h1><p className="subheading">Private sightseeing journeys, curated by our concierge.</p></div></div><div className="cab-grid">{cabs.map(c => <article className="cab-card" key={c.name}><img src={c.image} /><div className="cab-info"><span><Clock3 size={13} /> {c.time}</span><h3>{c.name}</h3><div><strong>${c.price}</strong> <small>per car</small><button className="primary-btn" onClick={() => book(c)}>Book ride</button></div></div></article>)}</div></> }
 
-function AdminPage({ page, user, bookings, tasks, updateTask, removeTask, orders, updateOrderStatus, setShowBooking, setShowTask, search, notify }) {
+function AdminPage({ page, user, bookings, tasks, updateTask, removeTask, orders, updateOrderStatus, payments, addPayment, openPay, closePay, payTarget, setShowBooking, setShowTask, search, notify }) {
   if (page === 'Housekeeping') return <HousekeepingPage tasks={tasks} updateTask={updateTask} removeTask={removeTask} setShowTask={setShowTask} search={search} notify={notify} />;
   if (page === 'Restaurant') return <RestaurantPage orders={orders} updateOrderStatus={updateOrderStatus} notify={notify} />;
+  if (page === 'Payments') return <PaymentsPage payments={payments} addPayment={addPayment} openPay={openPay} notify={notify} />;
   if (page === 'Guests') return <GuestsPage bookings={bookings} search={search} notify={notify} />;
   if (page === 'Reservations') {
     const filtered = bookings.filter(b => `${b.guest} ${b.property} ${b.room}`.toLowerCase().includes(search.toLowerCase()));
@@ -368,6 +397,276 @@ function TaskModal({ onClose, onSubmit }) {
           <Field label="Due (optional)" name="due_at" type="datetime-local" />
           <label className="field"><span>Notes</span><textarea name="notes" rows={3} placeholder="Add context for the team..." style={{borderRadius:10,padding:12,border:'1px solid #dfe8e5',font:'inherit',resize:'vertical'}}></textarea></label>
           <button className="primary-btn wide" type="submit"><Check size={17} /> Create task</button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+
+
+function BillingPage({ bookings, orders, payments, openPay, notify }) {
+  const myStays = bookings;
+  const myOrders = orders;
+  const myPayments = payments;
+  const pendingStays = myStays.filter(b => !b.paid);
+  const pendingOrders = myOrders.filter(o => !o.paid);
+  const pendingTotal = pendingStays.reduce((s, b) => s + Number(b.total || 0), 0)
+    + pendingOrders.reduce((s, o) => s + Number(o.total || 0), 0);
+  const completedPayments = myPayments.filter(p => p.status === 'completed');
+  const paidTotal = completedPayments.reduce((s, p) => s + Number(p.amount || 0), 0);
+  return (
+    <>
+      <div className="hero-row">
+        <div>
+          <p className="eyebrow">BILLING</p>
+          <h1>Pay for your <i>stay</i> with one tap.</h1>
+          <p className="subheading">Manage outstanding charges, receipts, and saved payment methods.</p>
+        </div>
+      </div>
+      <div className="stats-grid">
+        <Stat label="Outstanding" value={`$${pendingTotal.toFixed(2)}`} change="unpaid" icon={<Receipt size={18} />} />
+        <Stat label="Paid lifetime" value={`$${paidTotal.toFixed(2)}`} change={`${completedPayments.length} payments`} icon={<Check size={18} />} />
+        <Stat label="Saved methods" value="2" change="card · UPI" icon={<CreditCard size={18} />} />
+        <Stat label="Next charge" value={pendingTotal > 0 ? "Today" : "—"} change="auto-update" icon={<Clock3 size={18} />} />
+      </div>
+
+      <div className="section-title"><div><h2>Pending charges</h2><p>Invoices awaiting payment</p></div></div>
+      <div className="bill-grid">
+        {pendingStays.length === 0 && pendingOrders.length === 0 ? (
+          <div className="empty-card"><Check size={28} /><h3>You're all paid up</h3><p>No outstanding charges right now.</p></div>
+        ) : (
+          <>
+            {pendingStays.map(b => (
+              <article className="bill-card pending" key={`stay-${b.id}`}>
+                <div className="bill-head">
+                  <div>
+                    <p className="eyebrow hk-eyebrow">{b.property || 'Harbor House'}</p>
+                    <h3>{b.room || 'Deluxe King'}</h3>
+                    <span><CalendarDays size={12} /> {b.checkIn || '—'} → {b.checkOut || '—'}</span>
+                  </div>
+                  <span className="rk-status rk-status-pending">Pending</span>
+                </div>
+                <div className="bill-meta"><span>Stay</span><strong>${Number(b.total || 855).toFixed(2)}</strong></div>
+                <button className="primary-btn wide" onClick={() => openPay({ kind: 'stay', bookingId: b.id, amount: Number(b.total || 855), title: b.property || 'Harbor House', subtitle: b.room || 'Deluxe King', markPaid: () => { b.paid = true; } })}>
+                  <CreditCard size={14} /> Pay ${Number(b.total || 855).toFixed(2)}
+                </button>
+              </article>
+            ))}
+            {pendingOrders.map(o => (
+              <article className="bill-card pending" key={`order-${o.id}`}>
+                <div className="bill-head">
+                  <div>
+                    <p className="eyebrow hk-eyebrow">In-room dining</p>
+                    <h3>Order #{o.id}</h3>
+                    <span><Utensils size={12} /> {(o.items || []).map(i => i.name).slice(0,2).join(', ') || '—'}</span>
+                  </div>
+                  <span className="rk-status rk-status-pending">Pending</span>
+                </div>
+                <div className="bill-meta"><span>Order</span><strong>${Number(o.total || 0).toFixed(2)}</strong></div>
+                <button className="primary-btn wide" onClick={() => openPay({ kind: 'order', orderId: o.id, amount: Number(o.total || 0), title: 'In-room dining', subtitle: `Order #${o.id}`, markPaid: () => { o.paid = true; } })}>
+                  <CreditCard size={14} /> Pay ${Number(o.total || 0).toFixed(2)}
+                </button>
+              </article>
+            ))}
+          </>
+        )}
+      </div>
+
+      <div className="section-title" style={{ marginTop: 36 }}><div><h2>Payment history</h2><p>Receipts for completed transactions</p></div></div>
+      <div className="panel large-panel">
+        <div className="panel-heading"><div><h2>All transactions</h2><p>{myPayments.length} payments</p></div></div>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>REFERENCE</th><th>DESCRIPTION</th><th>METHOD</th><th>AMOUNT</th><th>STATUS</th><th>DATE</th></tr></thead>
+            <tbody>
+              {myPayments.map(p => (
+                <tr key={p.id}>
+                  <td><strong>{p.reference}</strong></td>
+                  <td>{p.description}</td>
+                  <td><span className="method-chip method-{p.method || 'card'}">{p.method === 'upi' ? 'UPI' : p.method === 'wallet' ? 'Wallet' : p.method === 'cash' ? 'Cash' : 'Card'}{p.card_last4 ? ` · ${p.card_last4}` : ''}</span></td>
+                  <td><strong>${Number(p.amount).toFixed(2)}</strong></td>
+                  <td><span className={`status ${p.status === 'completed' ? 'confirmed' : p.status === 'failed' ? 'pending' : 'reserved'}`}>{p.status}</span></td>
+                  <td>{new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {!myPayments.length && <div className="empty-state">No payments yet.</div>}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function PaymentsPage({ payments, addPayment, openPay, notify }) {
+  const totalRevenue = payments.filter(p => p.status === 'completed').reduce((s, p) => s + Number(p.amount), 0);
+  const pending = payments.filter(p => p.status === 'pending').reduce((s, p) => s + Number(p.amount), 0);
+  const failed = payments.filter(p => p.status === 'failed').length;
+  const byMethod = ['card', 'upi', 'wallet', 'cash'].map(m => ({
+    method: m,
+    total: payments.filter(p => p.method === m && p.status === 'completed').reduce((s, p) => s + Number(p.amount), 0),
+    count: payments.filter(p => p.method === m && p.status === 'completed').length
+  }));
+  const methodLabel = (m) => m === 'upi' ? 'UPI' : m === 'wallet' ? 'Wallet' : m === 'cash' ? 'Cash' : 'Card';
+  return (
+    <>
+      <div className="hero-row">
+        <div>
+          <p className="eyebrow">PAYMENTS</p>
+          <h1>Every dollar, <i>beautifully</i> tracked.</h1>
+          <p className="subheading">Revenue overview, processing fees, and customer transactions.</p>
+        </div>
+        <button className="primary-btn" onClick={() => openPay({ kind: 'manual', amount: 100, title: 'Manual charge', subtitle: 'Ad-hoc payment' })}>
+          <Plus size={17} /> Record payment
+        </button>
+      </div>
+      <div className="stats-grid">
+        <Stat label="Total revenue" value={`$${totalRevenue.toFixed(2)}`} change={`${payments.filter(p => p.status === 'completed').length} payments`} icon={<span className="dollar">$</span>} />
+        <Stat label="Outstanding" value={`$${pending.toFixed(2)}`} change="awaiting" icon={<Clock3 size={18} />} />
+        <Stat label="Failed" value={failed} change="retry" icon={<Receipt size={18} />} />
+        <Stat label="Avg. ticket" value={`$${(payments.length ? (totalRevenue / payments.filter(p => p.status === 'completed').length || 0) : 0).toFixed(2)}`} change="per charge" icon={<Banknote size={18} />} />
+      </div>
+      <div className="admin-grid">
+        <div className="panel large-panel">
+          <div className="panel-heading"><div><h2>Recent transactions</h2><p>{payments.length} payments in the system</p></div><button className="text-btn" onClick={() => notify('Exporting report')}><ArrowRight size={14} /> Export</button></div>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>CUSTOMER</th><th>DESCRIPTION</th><th>METHOD</th><th>AMOUNT</th><th>STATUS</th><th>REFERENCE</th></tr></thead>
+              <tbody>
+                {payments.map(p => (
+                  <tr key={p.id}>
+                    <td><div className="guest-cell"><div className="avatar avatar-user">{(p.customer_name || 'Guest').split(' ').map(x => x[0]).join('').slice(0,2)}</div><strong>{p.customer_name || 'Guest'}</strong></div></td>
+                    <td>{p.description}</td>
+                    <td><span className={`method-chip method-${p.method || 'card'}`}>{methodLabel(p.method)}{p.card_last4 ? ` · ${p.card_last4}` : ''}</span></td>
+                    <td><strong>${Number(p.amount).toFixed(2)}</strong></td>
+                    <td><span className={`status ${p.status === 'completed' ? 'confirmed' : p.status === 'failed' ? 'pending' : 'reserved'}`}>{p.status}</span></td>
+                    <td><code>{p.reference}</code></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!payments.length && <div className="empty-state">No payments yet.</div>}
+          </div>
+        </div>
+        <div className="panel">
+          <div className="panel-heading"><div><h2>Revenue by method</h2><p>Completed payments</p></div></div>
+          <div className="method-list">
+            {byMethod.map(m => (
+              <div className="method-row" key={m.method}>
+                <div className={`method-icon method-${m.method}`}>
+                  {m.method === 'card' ? <CreditCard size={18} /> : m.method === 'upi' ? <Building2 size={18} /> : m.method === 'wallet' ? <Wallet size={18} /> : <Banknote size={18} />}
+                </div>
+                <div className="method-info">
+                  <strong>{methodLabel(m.method)}</strong>
+                  <span>{m.count} transactions</span>
+                  <div className="method-bar"><i style={{ width: `${totalRevenue ? (m.total / totalRevenue) * 100 : 0}%` }} /></div>
+                </div>
+                <strong className="method-total">${m.total.toFixed(2)}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function PaymentModal({ onClose, target, onSubmit }) {
+  const [method, setMethod] = useState(target?.method || 'card');
+  const [cardNumber, setCardNumber] = useState('4242 4242 4242 4242');
+  const [cardName, setCardName] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('12/27');
+  const [cardCvc, setCardCvc] = useState('123');
+  const [upiId, setUpiId] = useState('');
+  const [wallet, setWallet] = useState('paypal');
+  const [processing, setProcessing] = useState(false);
+  const amount = Number(target?.amount || 0);
+  const submit = (e) => {
+    e.preventDefault();
+    setProcessing(true);
+    setTimeout(() => {
+      const reference = 'TXN' + Math.random().toString(36).slice(2, 8).toUpperCase() + Date.now().toString().slice(-3);
+      onSubmit({
+        amount,
+        method,
+        status: 'completed',
+        description: `${target?.title || 'Payment'}${target?.subtitle ? ' · ' + target.subtitle : ''}`,
+        card_last4: method === 'card' ? String(cardNumber).replace(/\s+/g, '').slice(-4) : null,
+        reference,
+        methodIcon: method,
+        bookingId: target?.bookingId || null,
+        orderId: target?.orderId || null,
+        customer_name: target?.customerName || null
+      });
+      setProcessing(false);
+    }, 700);
+  };
+  const methods = [
+    { key: 'card', label: 'Card', icon: <CreditCard size={16} /> },
+    { key: 'upi', label: 'UPI', icon: <Building2 size={16} /> },
+    { key: 'wallet', label: 'Wallet', icon: <Wallet size={16} /> },
+    { key: 'cash', label: 'Cash', icon: <Banknote size={16} /> }
+  ];
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="booking-modal payment-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <div>
+            <p className="eyebrow">SECURE CHECKOUT</p>
+            <h2>Complete payment</h2>
+          </div>
+          <button className="close-btn" onClick={onClose}><X size={18} /></button>
+        </div>
+        <div className="pay-summary">
+          <div>
+            <p className="eyebrow hk-eyebrow">{target?.title || 'Payment'}</p>
+            <strong>{target?.subtitle || ''}</strong>
+          </div>
+          <div className="pay-amount">${amount.toFixed(2)}</div>
+        </div>
+        <div className="pay-methods">
+          {methods.map(m => (
+            <button key={m.key} className={`pay-method ${method === m.key ? 'selected' : ''}`} onClick={() => setMethod(m.key)} type="button">
+              <span className="pay-method-icon">{m.icon}</span>
+              <span>{m.label}</span>
+            </button>
+          ))}
+        </div>
+        <form onSubmit={submit} className="pay-form">
+          {method === 'card' && (
+            <>
+              <label className="field"><span>Card number</span><input value={cardNumber} onChange={e => setCardNumber(e.target.value)} placeholder="1234 5678 9012 3456" required /></label>
+              <label className="field"><span>Cardholder name</span><input value={cardName} onChange={e => setCardName(e.target.value)} placeholder="As on card" required /></label>
+              <div className="form-row">
+                <label className="field"><span>Expiry (MM/YY)</span><input value={cardExpiry} onChange={e => setCardExpiry(e.target.value)} placeholder="MM/YY" required /></label>
+                <label className="field"><span>CVC</span><input value={cardCvc} onChange={e => setCardCvc(e.target.value)} placeholder="123" required /></label>
+              </div>
+            </>
+          )}
+          {method === 'upi' && (
+            <label className="field"><span>UPI handle</span><input value={upiId} onChange={e => setUpiId(e.target.value)} placeholder="name@bank" required /></label>
+          )}
+          {method === 'wallet' && (
+            <label className="field"><span>Wallet</span>
+              <select value={wallet} onChange={e => setWallet(e.target.value)}>
+                <option value="paypal">PayPal</option>
+                <option value="apple">Apple Pay</option>
+                <option value="google">Google Pay</option>
+                <option value="amazon">Amazon Pay</option>
+              </select>
+            </label>
+          )}
+          {method === 'cash' && (
+            <div className="pay-cash-note">
+              <Banknote size={18} />
+              <span>Cash on delivery — confirm to mark this invoice as paid.</span>
+            </div>
+          )}
+          <button className="primary-btn wide pay-submit" type="submit" disabled={processing}>
+            {processing ? 'Processing…' : (<><Check size={16} /> Pay ${amount.toFixed(2)}</>)}
+          </button>
+          <p className="pay-secure"><ShieldCheck size={13} /> Encrypted · PCI-DSS compliant</p>
         </form>
       </div>
     </div>

@@ -135,5 +135,52 @@ app.get('/api/restaurant/stats', auth, roles('super_admin','admin'), asyncRoute(
   res.json(summary);
 }));
 
+// =====================================================
+// PAYMENTS
+// =====================================================
+function generateReference() { return 'TXN' + Math.random().toString(36).slice(2, 8).toUpperCase() + Date.now().toString().slice(-4); }
+
+app.get('/api/payments', auth, asyncRoute(async (req, res) => {
+  const admin = ['admin','super_admin'].includes(req.user.role);
+  const where = admin ? '' : 'WHERE p.user_id=?';
+  const rows = await query(
+    `SELECT p.*, u.name AS customer_name FROM payments p JOIN users u ON u.id=p.user_id ${where} ORDER BY p.created_at DESC`,
+    admin ? [] : [req.user.id]
+  );
+  res.json(rows);
+}));
+app.post('/api/payments', auth, asyncRoute(async (req, res) => {
+  const missing = required(req.body, ['amount', 'method']);
+  if (missing) return res.status(400).json({ error: `${missing} is required.` });
+  if (!['card','upi','wallet','cash'].includes(req.body.method)) return res.status(400).json({ error: 'Invalid payment method.' });
+  const amount = Number(req.body.amount);
+  if (!Number.isFinite(amount) || amount <= 0) return res.status(400).json({ error: 'Amount must be greater than zero.' });
+  // Simulated fraud / validation rules
+  if (req.body.method === 'card') {
+    const digits = String(req.body.cardNumber || '').replace(/\s+/g, '');
+    if (!/^\d{13,19}$/.test(digits)) return res.status(400).json({ error: 'Card number must be 13 to 19 digits.' });
+    if (!/^\d{2}\/\d{2}$/.test(req.body.cardExpiry || '')) return res.status(400).json({ error: 'Card expiry must be MM/YY.' });
+    if (!/^\d{3,4}$/.test(req.body.cardCvc || '')) return res.status(400).json({ error: 'Card CVC must be 3 or 4 digits.' });
+  } else if (req.body.method === 'upi') {
+    if (!/^[\w.-]+@[\w.-]+$/.test(req.body.upiId || '')) return res.status(400).json({ error: 'Enter a valid UPI handle (example@bank).' });
+  }
+  const cardLast4 = req.body.method === 'card' ? String(req.body.cardNumber).replace(/\s+/g, '').slice(-4) : null;
+  const result = await query(
+    'INSERT INTO payments (user_id, booking_id, order_id, amount, method, status, description, card_last4, reference) VALUES (?,?,?,?,?,?,?,?,?)',
+    [req.user.id, req.body.bookingId || null, req.body.orderId || null, amount, req.body.method, 'completed', req.body.description || null, cardLast4, generateReference()]
+  );
+  res.status(201).json({ id: result.insertId, reference: null, status: 'completed' });
+}));
+app.get('/api/payments/stats', auth, roles('super_admin','admin'), asyncRoute(async (req, res) => {
+  const totals = await query(`SELECT COALESCE(SUM(amount),0) AS total FROM payments WHERE status='completed'`);
+  const byMethod = await query(`SELECT method, COALESCE(SUM(amount),0) AS total, COUNT(*) AS count FROM payments WHERE status='completed' GROUP BY method`);
+  const recent = await query(`SELECT p.*, u.name AS customer_name FROM payments p JOIN users u ON u.id=p.user_id ORDER BY p.created_at DESC LIMIT 8`);
+  res.json({ totalRevenue: Number(totals[0]?.total || 0), byMethod, recent });
+}));
+app.post('/api/payments/:id/refund', auth, roles('super_admin','admin'), asyncRoute(async (req, res) => {
+  await query('UPDATE payments SET status=? WHERE id=?', ['refunded', req.params.id]);
+  res.json({ ok: true });
+}));
+
 app.use((error, req, res, next) => { console.error(error); res.status(error.code === 'ER_DUP_ENTRY' ? 409 : 503).json({ error: dbError(error) }); });
 app.listen(port, () => console.log(`Hotel API listening on http://localhost:${port}`));

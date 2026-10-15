@@ -21,6 +21,8 @@ The application includes two role-based experiences:
 - Place food orders
 - Browse sightseeing experiences
 - Book hotel cab/sightseeing transportation
+- Pay for stays and dining via card, UPI, wallet, or cash
+- View payment history and outstanding invoices from the Billing page
 
 ### Super admin
 
@@ -31,6 +33,7 @@ The application includes two role-based experiences:
 - Review occupancy and revenue overview
 - Housekeeping operations board (create tasks, assign staff, track status)
 - Restaurant and kitchen view with live order queue (advance orders through pending → preparing → ready → completed)
+- Payments dashboard with revenue totals, breakdown by method, and full transaction log
 
 ### Backend
 
@@ -77,6 +80,7 @@ The application includes two role-based experiences:
 ├── sql/
 │   ├── schema.sql        # Database and table definitions
 │   ├── operations.sql    # Housekeeping task definitions and sample data
+│   ├── payments.sql      # Payments table definitions and sample data
 │   └── seed.sql          # Initial admin and sample data
 ├── index.html
 ├── vite.config.js        # Vite config and API proxy
@@ -267,6 +271,15 @@ DELETE /api/housekeeping-tasks/:id        # Admin only
 GET   /api/orders                  # Already documented above
 PATCH /api/orders/:id/status       # Admin only — advance kitchen status
 GET   /api/restaurant/stats        # Admin only — counts and revenue summary
+```
+
+### Payments
+
+```text
+GET  /api/payments                    # Admin sees all; customers see their own
+POST /api/payments                    # Process a payment (card, UPI, wallet, or cash)
+GET  /api/payments/stats              # Admin only — totals and breakdown by method
+POST /api/payments/:id/refund         # Admin only — mark payment refunded
 ```
 
 ### Users and health
